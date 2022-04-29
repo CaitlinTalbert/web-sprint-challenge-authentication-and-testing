@@ -30,7 +30,7 @@ Your finished project must include all of the following requirements (further in
 
 - [x] An authentication workflow with functionality for account creation and login, implemented inside `api/auth/auth-router.js`.
 - [x] Middleware used to restrict access to resources from non-authenticated requests, implemented inside `api/middleware/restricted.js`.
-- [ ] A minimum of 2 tests per API endpoint, written inside `api/server.test.js`.
+- [x] A minimum of 2 tests per API endpoint, written inside `api/server.test.js`.
 
 **IMPORTANT Notes:**
 
@@ -54,6 +54,22 @@ Your finished project must include all of the following requirements (further in
 Be prepared to demonstrate your understanding of this week's concepts by answering questions on the following topics.
 
 1. Differences between using _sessions_ or _JSON Web Tokens_ for authentication.
+
+Session are stored on the server and passed in requests through session cookies. While a user is logged in, the cookie is sent to the server with every request.
+This allows the server to compare the session id from the cookie against the information that is stored in memory to verify the users credentials, it then sends
+a response with the state.
+
+JSON Web Tokens contain a header, a payload, and a signature. The header contains the algorithm with the token type, the payload contains data we want to store in the token like permissions, and the signature is created by an encoded string with the header and payload together, then signed with a secret. All three parts creates a JWT.
+
 2. What does `bcryptjs` do to help us store passwords in a secure manner?
+
+It allows us to hash passwords, and determine how many rounds of hashing we want to perform which makes it harder for hackers to obtain the data.
+
 3. How are unit tests different from integration and end-to-end testing?
+
+Unit tests test a singular unit of code and are faster and easier to write because they focus on small sections of code at a time. Integration tests how different components are able to work together.
+and End to end tests the entire application from beginning to end and would mimick how the user would use the application.
+
 4. How does _Test Driven Development_ change the way we write applications and tests?
+
+Test driven development is where you write the tests first and the the code. You focus on the outcome of the code, and then write the code accordingly.
