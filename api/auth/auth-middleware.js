@@ -10,4 +10,14 @@ async function validateBody(req, res, next) {
   }
 }
 
-module.exports = { validateBody };
+async function checkIfExists(req, res, next) {
+  Users.findByUsername(req.userInput.username).then((user) => {
+    if (!user) {
+      next();
+    } else {
+      res.status(400).json("username taken");
+    }
+  });
+}
+
+module.exports = { validateBody, checkIfExists };
