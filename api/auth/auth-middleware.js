@@ -20,4 +20,15 @@ async function checkIfExists(req, res, next) {
   });
 }
 
-module.exports = { validateBody, checkIfExists };
+async function checkAuth(req, res, next) {
+  Users.findByUsername(req.userInput.username).then((user) => {
+    if (!user) {
+      res.status(404).json("invalid credentials");
+    } else {
+      req.user = user;
+      next();
+    }
+  });
+}
+
+module.exports = { validateBody, checkIfExists, checkAuth };

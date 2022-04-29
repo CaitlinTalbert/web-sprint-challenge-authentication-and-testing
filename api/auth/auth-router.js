@@ -2,10 +2,10 @@ const router = require("express").Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Users = require("./auth-model");
-const { validateBody, checkIfExists } = require("./auth-middleware");
+const { validateBody, checkIfExists, checkAuth } = require("./auth-middleware");
 const saltRounds = 8;
 
-router.post("/register", validateBody, checkIfExists, (req, res) => {
+router.post("/register", validateBody, checkIfExists, async (req, res) => {
   try {
     const hash = bcrypt.hashSync(req.userInput.password, saltRounds);
     const obj = {
@@ -26,33 +26,27 @@ router.post("/register", validateBody, checkIfExists, (req, res) => {
   }
 });
 
-/*
-    IMPLEMENT
-    You are welcome to build additional middlewares to help with the endpoint's functionality.
-    DO NOT EXCEED 2^8 ROUNDS OF HASHING!
+router.post("/login", validateBody, checkAuth, async (req, res) => {
+  try {
+    if (bcrypt.compareSync(req.userInput.password, req.user.password)) {
+      const payload = {
+        user_id: req.user.id,
+        username: req.user.username,
+        password: req.user.password,
+      };
+      const token = generateToken(payload);
+      res.status(200).json({ message: `welcome, ${req.user.username}`, token });
+    } else {
+      res.status(400).json("invalid credentials");
+    }
+  } catch (err) {
+    res.status(500).json({ message: "internal server error" });
+  }
+});
 
-    1- In order to register a new account the client must provide `username` and `password`:
-      {
-        "username": "Captain Marvel", // must not exist already in the `users` table
-        "password": "foobar"          // needs to be hashed before it's saved
-      }
-
-    2- On SUCCESSFUL registration,
-      the response body should have `id`, `username` and `password`:
-      {
-        "id": 1,
-        "username": "Captain Marvel",
-        "password": "2a$08$jG.wIGR2S4hxuyWNcBf9MuoC4y0dNy7qC/LbmtuFBSdIhWks2LhpG"
-      }
-
-    3- On FAILED registration due to `username` or `password` missing from the request body,
-      the response body should include a string exactly as follows: "username and password required".
-
-    4- On FAILED registration due to the `username` being taken,
-      the response body should include a string exactly as follows: "username taken".
-  */
-
-router.post("/login", (req, res) => {});
+function generateToken(payload) {
+  return jwt.sign(payload, "JWT_SECRET", { expiresIn: "1d" });
+}
 
 /*
     IMPLEMENT
