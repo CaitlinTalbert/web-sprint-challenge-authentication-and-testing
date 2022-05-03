@@ -63,14 +63,20 @@ describe("test API endpoints", () => {
     const Caitlin = await db("users").where("username", "Caitlin").first();
     expect(bcrypt.compareSync("momo", Caitlin.password)).toBeTruthy();
   }, 750);
-  test("[POST] /api/auth/login, responds with welcome message on successful login", async () => {
-    let res = await request(server).post("/api/auth/login").send(user1);
-    expect(res.body.message).toEqual(`welcome, ${user1.username}`);
-  });
+  // test("[POST] /api/auth/login, responds with welcome message on successful login", async () => {
+  //   let res = await request(server).post("/api/auth/login").send(user1);
+  //   expect(res.body.message).toEqual(`welcome, ${user1.username}`);
+  // });
   test("[POST] /api/auth/login, responds with status 400 - username and password required", async () => {
     let res = await request(server)
       .post("/api/auth/login")
       .send({ username: "", password: "idk" });
     expect(res.status).toBe(400);
   }, 750);
+  test("[POST] /api/auth/login, responds with status 404 - invalid credentials", async () => {
+    let res = await request(server)
+      .post("/api/auth/login")
+      .send({ username: "asdf", password: "5678" });
+    expect(res.status).toBe(404);
+  });
 });
